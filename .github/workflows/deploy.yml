@@ -37,7 +37,7 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_HOSTS }}" > ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
       - name: Upload artifacts
         shell: bash
         run: |
