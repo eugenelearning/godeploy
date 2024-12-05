@@ -20,7 +20,7 @@ jobs:
         run: go test
       - uses: actions/upload-artifact@v4
         with:
-          name: godeploy-artifacts-${{ steps.envs.outputs.ssha}}
+          name: godeploy-artifacts
           path: ./build/*
 
   deploy:
@@ -28,15 +28,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Set envs
-        id: envs
-        run: echo "ssha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-        
+    
+
       - name: Download atrifac
         uses: actions/download-artifact@v4
         with:
-          name: godeploy-artifacts-${{ steps.envs.outputs.ssha}}
+          name: godeploy-artifacts
       - name: Upload artifacts
         shell: bash
         run: |
-          ssh ./godeploy-artifacts-${{ steps.envs.outputs.ssha}}.zip github-ci@185.43.5.49:/~
+          ssh ./godeploy-artifacts.zip github-ci@185.43.5.49:/~
