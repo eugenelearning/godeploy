@@ -41,5 +41,7 @@ jobs:
         shell: bash
         run: |
           scp -r ~/build github_runner@${{ secrets.SSH_HOST }}:~
+          chmod -R +x ~/build
+          sudo systemctl restart go-web
 
 
