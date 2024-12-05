@@ -28,10 +28,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download atrifac
-        uses: actions/download-artifact@v4
-        with:
-          name: godeploy-artifacts
       - name: Create SSH key
         shell: bash
         run: |
@@ -39,6 +35,10 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
           echo "Host *\n  AddKeysToAgent yes\n  UseKeychain yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+      - name: Download atrifac
+        uses: actions/download-artifact@v4
+        with:
+          name: godeploy-artifacts
       - name: Upload artifacts
         shell: bash
         run: |
