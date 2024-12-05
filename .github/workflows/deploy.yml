@@ -35,12 +35,13 @@ jobs:
       - name: Create SSH key
         shell: bash
         run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "Host *\n    UseKeychain yes" > ~/.ssh/config
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
-          eval "$(ssh-agent -s)"
+          echo "Host *\n  AddKeysToAgent yes\n  UseKeychain yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
       - name: Upload artifacts
         shell: bash
         run: |
           scp  ./godeploy-artifacts.zip github-ci@${{ secrets.SSH_HOST }}:/~
+
+
+
