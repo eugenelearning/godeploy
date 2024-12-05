@@ -28,6 +28,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Set envs
+        id: envs
+        run: echo "ssha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        
       - name: Download atrifac
         uses: actions/download-artifact@v4
         with:
