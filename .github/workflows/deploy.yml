@@ -22,12 +22,6 @@ jobs:
         with:
           name: godeploy-artifacts
           path: ./build/*
-
-  deploy:
-    name: Deploy code
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Create SSH key
         shell: bash
         run: |
@@ -42,10 +36,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: godeploy-artifacts
+          path: build
       - name: Upload artifacts
         shell: bash
         run: |
-          scp  ./godeploy-artifacts.zip github-ci@${{ secrets.SSH_HOST }}:/~
-
+          scp godeploy-artifacts.zip github-ci@${{ secrets.SSH_HOST }}:/~
 
 
