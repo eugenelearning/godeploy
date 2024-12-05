@@ -23,9 +23,6 @@ jobs:
           name: godeploy-artifacts-${{ steps.envs.outputs.ssha}}
           path: ./build/*
 
-      - name: Upload binaries
-        run: 'scp '
-
   deploy:
     name: Deploy code
     needs: build
