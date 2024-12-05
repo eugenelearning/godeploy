@@ -43,4 +43,4 @@ jobs:
       - name: Upload artifacts
         shell: bash
         run: |
-          scp ./godeploy-artifacts.zip github-ci@${{ secrets.SSH_HOSTS }}:/~
+          scp ./godeploy-artifacts.zip github-ci@185.43.5.49:/~
