@@ -35,6 +35,7 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
           echo "Host *\n  AddKeysToAgent yes\n  UseKeychain yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+          eval "$(ssh-agent -s)"
       - name: Download atrifac
         uses: actions/download-artifact@v4
         with:
