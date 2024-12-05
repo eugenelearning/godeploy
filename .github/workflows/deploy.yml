@@ -18,22 +18,27 @@ jobs:
         run: ./scripts/build.sh
       - name: Test
         run: go test
-
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godeploy-artifacts
+          path: ./build/*
 
   deploy:
+    name: Deploy code
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - name: Download atrifac
+        uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
+          name: godeploy-artifacts
       - name: Create SSH key
+        shell: bash
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_HOSTS }}" > ~/.ssh/known_hosts
-      - name: Deploy with rsync
-        run: rsync -rav --delete build/ github-ci@${{ secrets.SSH_HOSTS }}:~
-
-
- 
+      - name: Upload artifacts
+        shell: bash
+        run: |
+          scp ./godeploy-artifacts.zip github-ci@${{ secrets.SSH_HOST }}:/~
