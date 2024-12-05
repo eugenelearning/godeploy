@@ -21,7 +21,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: godeploy-artifacts
-          path: ~/build/*
       - name: Create SSH key
         shell: bash
         run: |
