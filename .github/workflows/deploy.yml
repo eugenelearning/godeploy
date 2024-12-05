@@ -9,11 +9,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set envs
+        id: envs
+        run: echo "ssha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build
         run: ./scripts/build.sh
       - name: Test
         run: go test
       - uses: actions/upload-artifact@v4
         with:
-          name: my-artifact
+          name: godeploy-artifacts-${{ steps.envs.outputs.ssha}}
           path: ./build/*
+
+      - name: Upload binaries
+        run: 'scp '
+
+  deploy:
+    name: Deploy code
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download atrifac
+        uses: actions/download-artifact@v4
+        with:
+          name: godeploy-artifacts-${{ steps.envs.outputs.ssha}}
+      - name: Upload artifacts
+        shell: bash
+        run: |
+          ssh ./godeploy-artifacts-${{ steps.envs.outputs.ssha}}.zip github-ci@185.43.5.49:/~

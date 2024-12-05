@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-targets=("windows/amd64" "windows/386" "darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+#targets=("windows/amd64" "windows/386" "darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+targets=("linux/arm64")
 
 for target in "${targets[@]}"; do
 	parts=(${target//\// })
