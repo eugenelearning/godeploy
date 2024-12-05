@@ -35,11 +35,10 @@ jobs:
       - name: Create SSH key
         shell: bash
         run: |
-          eval "$(ssh-agent -s)"
           install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "Host *\n    UseKeychain yes" > ~/.ssh/config
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
-          ssh-add ~/.ssh/id_rsa
       - name: Upload artifacts
         shell: bash
         run: |
