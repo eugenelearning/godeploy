@@ -9,11 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set envs
-        id: envs
-        run: echo "ssha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build
         run: ./scripts/build.sh
       - name: Test
@@ -24,13 +19,7 @@ jobs:
           path: build/*
       - name: Create SSH key
         shell: bash
-        run: |
-          mkdir ~/.ssh/
-          touch ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-          echo "Host ${{ secrets.SSH_HOST }}\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+        run: ./scripts/add-keys.sh ${{ secrets.SSH_KEY }} ${{ secrets.SSH_HOST }}
 
       - name: Download atrifac
         uses: actions/download-artifact@v4
@@ -39,10 +28,6 @@ jobs:
           path: ~/build
       - name: Upload artifacts
         shell: bash
-        run: |
-          ssh github_runner@${{ secrets.SSH_HOST }} "sudo systemctl stop go-web-site"
-          scp -r ~/build github_runner@${{ secrets.SSH_HOST }}:~
-          chmod -R +x ~/build
-          ssh github_runner@${{ secrets.SSH_HOST }} "sudo systemctl start go-web-site"
+        run: ./scripts/deploy.sh ${{ secrets.SSH_HOST }}
 
 
