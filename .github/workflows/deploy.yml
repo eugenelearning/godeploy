@@ -12,7 +12,6 @@ jobs:
       - name: Run unit tests
         run: go test
 
-
   build:
     needs: check
     runs-on: ubuntu-latest
@@ -33,7 +32,7 @@ jobs:
     steps:
       - name: Create SSH key
         shell: bash
-        run: ./scripts/build.sh ${{ secrets.SSH_KEY }}
+        run: |
           mkdir ~/.ssh/
           touch ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
