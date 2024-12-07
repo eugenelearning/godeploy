@@ -6,10 +6,12 @@ import (
 	"runtime"
 )
 
-func handleTestRoute(w http.ResponseWriter, r *http.Request) {
+// Обработчик роута /hc - будет использоваться для тестирования и проверки состояния сервиса
+func handleHealthcheckRoute(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("it works"))
 }
 
+// Обработчик корневого - будет выводить информацию о ОС и картинку из DOOM :)
 func handleRootRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Operating system: %s\n OS architecture: %s\n\n", runtime.GOOS, runtime.GOARCH)
 
@@ -39,10 +41,10 @@ func handleRootRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
-	http.HandleFunc("/testme", handleTestRoute)
-
+	// Маппим урлы на обработчики
+	http.HandleFunc("/hc", handleHealthcheckRoute)
 	http.HandleFunc("/", handleRootRoute)
 
+	// Старт http сервера
 	http.ListenAndServe(":3007", nil)
 }

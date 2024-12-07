@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestHandleTestRoute(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/testme", nil)
+func TestHandleHealthcheckRoute(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/hc", nil)
 	w := httptest.NewRecorder()
 
-	handleTestRoute(w, request)
+	handleHealthcheckRoute(w, request)
 
 	resp := w.Body.String()
 
