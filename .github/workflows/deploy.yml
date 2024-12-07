@@ -1,37 +1,51 @@
 name: Go
 
+# Пусть триггером будет пуш в осносвную ветку
 on:
   push:
     branches: [ "main" ]
 
+# Определяем основные шаги
 jobs:
+
+  # Проверка и тестирование
   check:
+    # Образ для раннера сборки, укажем явно чтобы не было "сюрпризов" от latest
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run unit tests
+        # команда шага
         run: go test
 
+  # Сборка и загрузка испольняемых файлов
   build:
+    # Шаг выполняется после тестиования
     needs: check
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Build
+        # Кросс-компиляция бинарей
         run: ./scripts/build.sh
       - name: Test
         run: go test
+      # загрузка файлов
       - uses: actions/upload-artifact@v4
         with:
           name: godeploy-artifacts
           path: build/*
 
+  # Выгрузка исполняемых файлов на серве и деплой
   deploy:
+    # Шаг выполняется после тестиования и подготовки бинарей
     needs: [check, build]
     runs-on: ubuntu-24.04
     steps:
+      # Для выгрузки и деплоя настраиваем SSH и докидываем в раннер ключи, для хранения приватного ключа и адреса сервера используем secrets
       - name: Create SSH key
         shell: bash
+        # создадим раннеру ключ и скопируем в него ранее созданный приватный ключ, указываем хост в known_hosts чтобы избежать промпта
         run: |
           mkdir ~/.ssh/
           touch ~/.ssh/id_rsa
@@ -39,11 +53,13 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           echo "Host ${{ secrets.SSH_HOST }}\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+        # скачаем артефакты
       - name: Get artifacts
         uses: actions/download-artifact@v4
         with:
           name: godeploy-artifacts
           path: ~/build
+      # выгружаем артефакты на сервер и перезапускаем сервис
       - name: Restart service
         shell: bash
         run: |
