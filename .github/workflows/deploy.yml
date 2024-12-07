@@ -2,16 +2,54 @@ name: Go
 
 on:
   push:
-    branches: [ "ci" ]
+    branches: [ "main" ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  check:
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Run unit tests
+        run: go test
 
-    - name: Build
-      run: ./scripts/build.sh
+  build:
+    needs: check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: ./scripts/build.sh
+      - name: Test
+        run: go test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godeploy-artifacts
+          path: build/*
 
-    - name: Test
-      run: go test
+  deploy:
+    needs: [check, build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Create SSH key
+        shell: bash
+        run: |
+          mkdir ~/.ssh/
+          touch ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          echo "Host ${{ secrets.SSH_HOST }}\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+      - name: Get artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: godeploy-artifacts
+          path: ~/build
+      - name: Restart service
+        shell: bash
+        run: |
+          ssh github_runner@${{ secrets.SSH_HOST }} "sudo systemctl stop go-web-site"
+          scp -r ~/build github_runner@${{ secrets.SSH_HOST }}:~
+          chmod -R +x ~/build
+          ssh github_runner@${{ secrets.SSH_HOST }} "sudo systemctl start go-web-site"
+
+

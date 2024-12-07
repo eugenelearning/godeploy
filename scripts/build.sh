@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-targets=("windows/amd64" "windows/386" "darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+targets=("windows/amd64" "windows/386" "darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64");
 
 for target in "${targets[@]}"; do
 	parts=(${target//\// })
@@ -13,12 +13,12 @@ for target in "${targets[@]}"; do
 		output_name+='.exe'
 	fi	
 
-    echo $output_name
+    echo $output_name;
 
-	env GOOS=$GOOS GOARCH=$GOARCH go build -o $output_name
+	env GOOS=$GOOS GOARCH=$GOARCH go build -o $output_name;
 
 	if [ $? -ne 0 ]; then
-   		echo 'An error has occurred! Aborting the script execution...'
+   		echo 'Ah caramba! Some thing whent, aborting execution...'
 		exit 1
 	fi
 done
